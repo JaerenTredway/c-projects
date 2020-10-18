@@ -6,6 +6,8 @@
  * author:       Jaeren Tredway
  * project:      #6: Secret: Steganography Lab
  * Description:
+ *  Update v.2:
+ *  	1.	stream processing added with no bit storage needed
  *  Input and process:
  *      1.  read in a stream of input character-by-character 
  *      2.  for each period/dot, count the number of spaces that  
