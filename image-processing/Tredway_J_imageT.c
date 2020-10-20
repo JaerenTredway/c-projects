@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>   // to use exit()
+#include <stdlib.h>     // to use exit()
 #include <stdbool.h>
+#include <string.h>     // to use strcmp()
 
 /* ************************************
  * author:       Jaeren Tredway
@@ -31,6 +32,7 @@
 
 //VARIABLES:
 int size; //get the array size from the first line of input
+char* usage = "One or more faulty function command args.\nValid command line args:\nflip V, flip v, flip H, flip h\ninv\nredeye\nexample: ./a.out flip V inv redeye < Images/image1";
 
 
 //FUNCTIONS:
@@ -47,9 +49,11 @@ void readInput (char pic[size][size]) {
             } else {
                 j--; 
             }
+            //FIXME:
+            if (pic[i][j] == ' ') pic[i][j] = '_';
             c = getchar();
         }
-    }// END input reader
+    }
 }
 
 
@@ -66,8 +70,32 @@ void displayPicture (char pic[size][size]) {
 }
 
 //3. invert picture (change '*' to ' ' and vice versa):
-//4. flip (across horizontal or vertical axis):
-//5. removeRedEye (delete any star not touching another star):
+void invert (char pic[][size]) {
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++) {
+            if (pic[i][j] == '*') {
+                pic[i][j] = '_';
+            } else if (pic[i][j] == '_') {
+                pic[i][j] = '*';
+            }
+        }
+    }
+}
+
+//4. flip across horizontal axis: (flipH)
+
+//5. flip across vertical axis:
+void flipV (char pic[][size]) {
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size/2; j++) {
+            char temp = pic[i][j];
+		    pic[i][j] = pic[i][size-j-1];
+		    pic[i][size-j-1] = temp;
+        }
+    }
+}
+
+//6. removeRedEye (delete any star not touching another star):
 
 /* ************************************
  * Description: The main function:
@@ -83,15 +111,6 @@ void displayPicture (char pic[size][size]) {
 ************************************ */
 int main(int argc, char *argv[]) {
 
-    // validate user's run command or show usage instructions:
-    //FIXME: this needs to test that the run command includes the input file 
-    // like this: ./a.out (list of desired functions here, if any) < image1
-        // if (...) {
-        //     printf("Required: the executable file (a.out), then the functions that you are calling, followed by the input file name. For example:\n");
-        //     printf("./a.out flip H inv redeye flip V < ./Images/image1\n");
-        //     exit(1);
-        // }
-
     // get size of array:
     size = (int)(getchar() - 48);
 
@@ -99,11 +118,31 @@ int main(int argc, char *argv[]) {
     char picture[size][size];
     readInput(picture);
 
-    // loop through command line args and call each function:
-        // exit() with code 2 for any faulty command
+    // loop through command line args and get the function commands:
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "inv") == 0) {
+            invert(picture);
+        } else if ((strcmp(argv[i], "flip") == 0) && (argc > (i+1))) {
+            if (strcmp(argv[i+1], "V")) {
+                flipV(picture);
+                i++;
+            } else if (strcmp(argv[i+1], "v")) {
+                flipV(picture);
+                i++;
+            } else {
+                printf("%s\n", usage);
+                printf("\nerror code = 2\n");
+                exit(2);
+            }
+        } else {
+            printf("%s\n", usage);
+            printf("\nerror code = 2\n");
+            exit(2); 
+        }
+    }
+        
 
     // output resulting image:
     displayPicture(picture);
     return 0;
 }//END main()
-
