@@ -83,6 +83,15 @@ void invert (char pic[][size]) {
 }
 
 //4. flip across horizontal axis: (flipH)
+void flipH (char pic[][size]) {
+    for(int i = 0; i < size/2; i++) {
+        for(int j = 0; j < size; j++) {
+            char temp = pic[i][j];
+		    pic[i][j] = pic[size-i-1][j];
+		    pic[size-i-1][j] = temp;
+        }
+    }
+}
 
 //5. flip across vertical axis:
 void flipV (char pic[][size]) {
@@ -123,11 +132,17 @@ int main(int argc, char *argv[]) {
         if (strcmp(argv[i], "inv") == 0) {
             invert(picture);
         } else if ((strcmp(argv[i], "flip") == 0) && (argc > (i+1))) {
-            if (strcmp(argv[i+1], "V")) {
+            if (strcmp(argv[i+1], "V") == 0) {
                 flipV(picture);
                 i++;
-            } else if (strcmp(argv[i+1], "v")) {
+            } else if (strcmp(argv[i+1], "v") == 0) {
                 flipV(picture);
+                i++;
+            } else if (strcmp(argv[i+1], "H") == 0) {
+                flipH(picture);
+                i++;
+            } else if (strcmp(argv[i+1], "h") == 0) {
+                flipH(picture);
                 i++;
             } else {
                 printf("%s\n", usage);
