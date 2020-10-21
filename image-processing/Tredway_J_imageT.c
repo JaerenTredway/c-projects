@@ -54,8 +54,6 @@ void readInput (char pic[size][size]) {
             } else {
                 j--; 
             }
-//************FIXME:
-            //if (pic[i][j] == ' ') pic[i][j] = '_';
             c = getchar();
         }
     }
@@ -78,6 +76,7 @@ void displayPicture (char pic[size][size]) {
         }
     }
 }
+
 
 /* 
  * function 3:
