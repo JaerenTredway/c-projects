@@ -36,7 +36,12 @@ char* usage = "One or more faulty function command args.\nValid command line arg
 
 
 //FUNCTIONS:
-//1. read input file and build 2D array:
+/* 
+ * function 1:
+ * Description: read input file and build 2D array
+ * Parameters:  a 2D array (the picture)
+ * Return:      nothing (void)
+ */
 void readInput (char pic[size][size]) {
     char c = getchar();
     for (int i = 0; i < size; i++) {
@@ -49,15 +54,20 @@ void readInput (char pic[size][size]) {
             } else {
                 j--; 
             }
-            //FIXME:
-            if (pic[i][j] == ' ') pic[i][j] = '_';
+//************FIXME:
+            //if (pic[i][j] == ' ') pic[i][j] = '_';
             c = getchar();
         }
     }
 }
 
 
-//2. display picture:
+/* 
+ * function 2:
+ * Description: display the picture
+ * Parameters:  a 2D array (the picture)
+ * Return:      nothing (void)
+ */
 void displayPicture (char pic[size][size]) {
     for(int i = 0; i < size; i++) {
         for(int j = 0; j < size; j++) {
@@ -69,20 +79,31 @@ void displayPicture (char pic[size][size]) {
     }
 }
 
-//3. invert picture (change '*' to ' ' and vice versa):
+/* 
+ * function 3:
+ * Description: invert each pixel (change '*' to ' ' and vice versa)
+ * Parameters:  a 2D array (the picture)
+ * Return:      nothing (void)
+ */
 void invert (char pic[][size]) {
     for(int i = 0; i < size; i++) {
         for(int j = 0; j < size; j++) {
             if (pic[i][j] == '*') {
-                pic[i][j] = '_';
-            } else if (pic[i][j] == '_') {
+                pic[i][j] = ' ';
+            } else if (pic[i][j] == ' ') {
                 pic[i][j] = '*';
             }
         }
     }
 }
 
-//4. flip across horizontal axis: (flipH)
+
+/* 
+ * function 4:
+ * Description: flip image across horizontal axis
+ * Parameters:  a 2D array (the picture)
+ * Return:      nothing (void)
+ */
 void flipH (char pic[][size]) {
     for(int i = 0; i < size/2; i++) {
         for(int j = 0; j < size; j++) {
@@ -93,7 +114,13 @@ void flipH (char pic[][size]) {
     }
 }
 
-//5. flip across vertical axis:
+
+/* 
+ * function 5:
+ * Description: flip image across vertical axis
+ * Parameters:  a 2D array (the picture)
+ * Return:      nothing (void)
+ */
 void flipV (char pic[][size]) {
     for(int i = 0; i < size; i++) {
         for(int j = 0; j < size/2; j++) {
@@ -104,7 +131,41 @@ void flipV (char pic[][size]) {
     }
 }
 
-//6. removeRedEye (delete any star not touching another star):
+
+/* 
+ * function 6:
+ * Description: delete any star not touching another star (change to ' ')
+ * Parameters:  a 2D array (the picture)
+ * Return:      nothing (void)
+ */
+void removeRedEye (char pic[][size]) {
+    bool isRedEye = true;
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++) {
+            if (pic[i][j] == '*') {
+                //process same row left:
+                if (j > 0 && pic[i][j-1] == '*') isRedEye = false;
+                //process same row right:
+                if (j < (size-1) && pic[i][j+1] == '*') isRedEye = false;
+                //process row above (left):
+                if (j > 0 && i > 0 && pic[i-1][j-1] == '*') isRedEye = false;
+                //process row above (center):
+                if (i > 0 && pic[i-1][j] == '*') isRedEye = false;
+                //process row above (right):
+                if (j < (size-1) && i > 0 && pic[i-1][j+1] == '*') isRedEye = false;
+                //process row below (left):
+                if (j > 0 && i < (size-1) && pic[i+1][j-1] == '*') isRedEye = false;
+                //process row below (center):
+                if (i < (size-1) && pic[i+1][j] == '*') isRedEye = false;
+                //process row below (right):
+                if (j < (size-1) && i < (size-1) && pic[i+1][j+1] == '*') isRedEye = false;
+                if (isRedEye) pic[i][j] = ' ';
+                isRedEye = true; //reset default setting
+            }
+        }
+    }
+}
+
 
 /* ************************************
  * Description: The main function:
@@ -149,6 +210,8 @@ int main(int argc, char *argv[]) {
                 printf("\nerror code = 2\n");
                 exit(2);
             }
+        } else if (strcmp(argv[i], "redeye") == 0) {
+            removeRedEye(picture);
         } else {
             printf("%s\n", usage);
             printf("\nerror code = 2\n");
