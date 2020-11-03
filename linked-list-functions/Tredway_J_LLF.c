@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>   // to use exit()
 #include <string.h>
+#include <stdbool.h>
 
 /* ************************************
  * Author:      Jaeren Tredway
@@ -64,35 +65,56 @@ void *set(LinkedList *someList, int position, void *newElement);
 /* ************************************
  * MAIN FUNCTION:
  * Description: 1. INPUT:   read one line of input from stdin then proceed
- *              2. PROCESS: process that line using the corresponding argv[i]
- *              3. OUTPUT:  at EOF print out the resulting linked list
+ *              2. PROCESS: process that line using the corresponding function
+ *              3. OUTPUT:  for every 'o' command, print the list
  * Parameters:  int argc: the number of command line args
  *              char *argv[]: the string array of command line args 
- * Return: int: return 0 for no problems
- *              return 1 for absence of commands 
- *              return 2 if linkedList position is illegal
+ *              the only command line arg is the executable file name (a.out)
+ * Return/exit: return  0 for no problems
+ *              exit    1 if the syntax of the input file is faulty
+ *              exit    2 if linkedList position is illegal
 ************************************ */
 int main(int argc, char *argv[]) {
     
-    // create the linked list:
+    // create the empty linked list:
     LinkedList   myList;    
     LinkedList  *roster = &myList;
     createList (roster);  // initialize the fields of the list
 
-    // validate user's run command or show usage instructions:
-    if (argc < 2) {
-        printf("Required: the executable file (a.out), then the functions that you are calling, followed by the redirected input file name. For example:\n");
-        printf("./a.out argsGoHere < inputFileName\n")
-        return 1; 
-    }
-
-    // read one line of input at a time, then process it with it's corresponding argv[i]:
-    while (c != EOF) {
-        // getchar() etc...
-    }
-
-    // output the resulting linked list:
-    // ...
+    // read one line of input at a time, then process it:
+    char str[MAX_NAME_LENGTH];
+    while (fgets(str, MAX_NAME_LENGTH, stdin) != NULL) {
+        printf("%s", str); 
+        char command = str[0];
+        printf("command = %c\n", command);
+        switch (command) {
+            case 'a':
+                // addEnd
+                break;
+            case 'd':
+                // *delete
+                break;
+            case 'o':
+                // outputList
+                break;
+            case 'f':
+                // addFirst
+                break;
+            case 'r':
+                // *removeLast
+                break;
+            case 'c':
+                // clear
+                break;
+            case 's':
+                // *set
+                break;
+            default:
+                exit(1); //syntax of input file is faulty
+        }//END switch()
+    }//END while()
+    
+    return 0;
 
 }//END main()
 
@@ -108,7 +130,7 @@ int main(int argc, char *argv[]) {
 void createList (LinkedList *someList) 
 {
   someList->size = 0; 
-  someList->header = malloc ( sizeof (Node) );
+  someList->header = malloc (sizeof(Node));
   someList->header->data = NULL;
   someList->header->next = someList->header;
   someList->header->prev = someList->header;
@@ -125,10 +147,10 @@ void createList (LinkedList *someList)
 void addEnd (LinkedList *someList, void *newElement) 
 {
   Node *lastNode = someList->header->prev;
-  Node *newNode = malloc ( sizeof ( Node ) );
-  newNode->data = newData;          // set the fields of the new Node
+  Node *newNode = malloc (sizeof(Node));
+  newNode->data = newElement;          // set the fields of the new Node
   newNode->next = someList->header;
-  newNode->prev = someList->header->prev
+  newNode->prev = someList->header->prev;
   someList->header->prev->next = newNode;  // splice-in the newNode
   someList->header->prev = newNode;        // into the List
   someList->size++;
