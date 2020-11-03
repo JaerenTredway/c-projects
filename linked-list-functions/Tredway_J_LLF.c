@@ -105,8 +105,13 @@ int main(int argc, char *argv[]) {
  * Parameters:      the linked list you are allocating memory for
  * Return:          nothing (void)
  */
-void createList (LinkedList *someList) {
-    //function code here
+void createList (LinkedList *someList) 
+{
+  someList->size = 0; 
+  someList->header = malloc ( sizeof (Node) );
+  someList->header->data = NULL;
+  someList->header->next = someList->header;
+  someList->header->prev = someList->header;
 }
 
 
@@ -117,8 +122,16 @@ void createList (LinkedList *someList) {
  *              2. the element you are adding
  * Return:      nothing (void)
  */
-void addEnd (LinkedList *someList, void *newElement) {
-    //function code here
+void addEnd (LinkedList *someList, void *newElement) 
+{
+  Node *lastNode = someList->header->prev;
+  Node *newNode = malloc ( sizeof ( Node ) );
+  newNode->data = newData;          // set the fields of the new Node
+  newNode->next = someList->header;
+  newNode->prev = someList->header->prev
+  someList->header->prev->next = newNode;  // splice-in the newNode
+  someList->header->prev = newNode;        // into the List
+  someList->size++;
 }
 
 
@@ -127,10 +140,23 @@ void addEnd (LinkedList *someList, void *newElement) {
  * Description: delete an element from the given position
  * Parameters:  1. the linked list
  *              2. the position you are deleting
- * Return:      nothing (void)
+ * Return:      1. "return" a pointer to the data that was deleted 
  */
-void *delete (LinkedList *someList, int position) {
-    //function code here
+void *delete (LinkedList *someList, int position) 
+{
+  if ( position < 0  ||  position >= someList->size ) 
+    exit(2);
+
+  // walk down the list until we reach the node to be removed
+  Node *temp = someList->header;
+  for ( int i=0; i <= position; i++ )
+     temp = temp->next;
+  void *removedData = temp->data;
+  temp->prev->next = temp->next;   // splice-out the Node
+  temp->next->prev = temp->prev; 
+  someList->size--;
+  free( temp );   // free-up the memory of the deleted Node
+  return ( removedData );
 }
 
 
@@ -140,9 +166,23 @@ void *delete (LinkedList *someList, int position) {
  * Parameters:  1. the linked list
  * Return:      nothing (void)
  */
-void outputList(LinkedList *someList) {
-    //function code here
-}//END function definitions
+void outputList(LinkedList *someList) 
+{
+  if ( someList == NULL  )
+     return;
+  if ( someList->size == 0 )  {
+     printf ( "[]\n" );
+     return;
+  }
+  printf ( "[" );
+  Node *temp = someList->header->next;
+  for ( int num = 0; num < someList->size; num++ ) {
+     printf("%s%s", (char *) temp->data,
+                    (num < someList->size-1) ? " " : "" );
+     temp =  temp->next;
+  }
+  printf ( "]\n" );
+}
 
 
 /* 
@@ -152,8 +192,9 @@ void outputList(LinkedList *someList) {
  *              2. the element you are adding
  * Return:      nothing (void)
  */
-void addFirst(LinkedList *someList, void *newElement) {
-    //function code here
+void addFirst(LinkedList *someList, void *newElement) 
+{
+    //TODO: function code here
 }
 
 
@@ -161,10 +202,13 @@ void addFirst(LinkedList *someList, void *newElement) {
  * function 6:
  * Description: delete the last element in the list
  * Parameters:  1. the linked list
- * Return:      nothing (void)
+ * Return:      1. "return" a pointer to the data that was deleted from the list
+ *              2. if the list is empty, exit the program with status 2
  */
-void *removeLast(LinkedList *someList) {
-    //function code here
+void *removeLast(LinkedList *someList) 
+{
+    //TODO: function code here
+    return NULL;
 }
 
 
@@ -174,8 +218,9 @@ void *removeLast(LinkedList *someList) {
  * Parameters:  1. the linked list
  * Return:      nothing (void)
  */
-void clear(LinkedList *someList) {
-    //function code here
+void clear(LinkedList *someList) 
+{
+    //TODO: function code here
 }
 
 
@@ -185,9 +230,13 @@ void clear(LinkedList *someList) {
  * Parameters:  1. the linked list
  *              2. the position that is being replaced
  *              3. the new element
- * Return:      nothing (void)
+ * Return:      1. "return" a pointer to the data that was replaced
+ *              2. if the position is illegal, exit the program with status 2
  */
-void *set(LinkedList *someList, int position, void *newElement) {
-    //function code here
+void *set(LinkedList *someList, int position, void *newElement) 
+{
+    //TODO: function code here
+    return NULL;
 }
+
 //**** END function definitions ****
