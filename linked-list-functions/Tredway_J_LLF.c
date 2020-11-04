@@ -17,7 +17,7 @@
  *  Functions (basic outline): 
  *      1.  createList()    allocates memory for the 'dummy header node'
  *      2.  addEnd()        add a new data element to the end of the list
- *      3.  *delete()       delete an element from the given position
+ *      3.  *delete()       delete an element from the given positionString
  *      4.  outputList()    output the contents of the list as strings
  *      5.  addFirst()      add an element to index 0
  *      6.  *removeLast()   delete the last element in the list
@@ -29,7 +29,7 @@
  *  To compile, run, and test:
  *      1.  gcc Tredway_J_LLF.c
  *      2.  ./a.out someArgs < someInputFile > someOutputFile
- *      3.  visually inspect output to test
+ *      3.  diff myOutput outputFile1
  ************************************ */
 
 
@@ -41,8 +41,7 @@ typedef struct node {   // represents one node in a Linked List
 } Node;
 
 typedef struct {   // represents a Linked List
-  Node  *header;   // pointer to the "dummy header node" of
-                   // the Linked List
+  Node  *header;   // pointer to the "dummy header node" of the Linked List
   int   size;      // number of nodes in the Linked List
 } LinkedList;
 
@@ -54,12 +53,12 @@ typedef struct {   // represents a Linked List
 //FUNCTION PROTOTYPES:
 void createList (LinkedList *someList);
 void addEnd(LinkedList *someList, void *newElement);
-void *delete(LinkedList *someList, int position);
+void *delete(LinkedList *someList, int positionString);
 void outputList(LinkedList *someList);
 void addFirst(LinkedList *someList, void *newElement);
 void *removeLast(LinkedList *someList);
 void clear(LinkedList *someList);
-void *set(LinkedList *someList, int position, void *newElement);
+void *set(LinkedList *someList, int positionString, void *newElement);
 
 
 /* ************************************
@@ -72,27 +71,48 @@ void *set(LinkedList *someList, int position, void *newElement);
  *              the only command line arg is the executable file name (a.out)
  * Return/exit: return  0 for no problems
  *              exit    1 if the syntax of the input file is faulty
- *              exit    2 if linkedList position is illegal
+ *              exit    2 if linkedList positionString is illegal
 ************************************ */
 int main(int argc, char *argv[]) {
     
     // create the empty linked list:
     LinkedList   myList;    
     LinkedList  *roster = &myList;
-    createList (roster);  // initialize the fields of the list
+    createList (roster);  // initialize the dummy header to start the list
+
 
     // read one line of input at a time, then process it:
-    char str[MAX_NAME_LENGTH];
-    while (fgets(str, MAX_NAME_LENGTH, stdin) != NULL) {
-        printf("%s", str); 
-        char command = str[0];
-        printf("command = %c\n", command);
+    char str[25];
+    char command; //the first char of input that shows the function to call
+    char positionString[10]; //the positionString in the list to delete or overwrite
+    int len; //the length of the input str not including first char and space
+    char username[MAX_NAME_LENGTH]; //the person's name from the line of input
+    while (fgets(str, 25, stdin) != NULL) {
+        printf("%s", str); //TEST***********
+        command = str[0]; 
+        len = strlen(str)-2;
+        printf("length is %d\n", len);  
         switch (command) {
             case 'a':
-                // addEnd
+                // add an element to the end with addEnd():
+                memcpy(&username, &str[2], len); //get a substring from [2] to the end
+                username[len-1] = '\0'; //terminate substring
+                addEnd(roster, username); 
+                outputList(roster);
                 break;
             case 'd':
-                // *delete
+                // delete an element with *delete():
+                positionString[0] = str[2];
+                if (str[3] != ' ') {
+                    strcat(positionString, &str[3]);
+                } 
+                if (str[4] != ' ') {
+                    strcat(positionString, &str[4]);
+                }
+                printf("positionString = %s\n", positionString);
+                int positionInt = atoi(positionString);
+                printf("positionInt = %d\n", positionInt);
+                delete(roster, positionInt);
                 break;
             case 'o':
                 // outputList
@@ -113,7 +133,10 @@ int main(int argc, char *argv[]) {
                 exit(1); //syntax of input file is faulty
         }//END switch()
     }//END while()
-    
+
+    printf("*****************TEST RESULT:\n");
+    outputList(roster);
+    printf("size = %d\n", roster->size);
     return 0;
 
 }//END main()
@@ -159,26 +182,26 @@ void addEnd (LinkedList *someList, void *newElement)
 
 /* 
  * function 3:
- * Description: delete an element from the given position
+ * Description: delete an element from the given positionString
  * Parameters:  1. the linked list
- *              2. the position you are deleting
+ *              2. the positionString you are deleting
  * Return:      1. "return" a pointer to the data that was deleted 
  */
-void *delete (LinkedList *someList, int position) 
+void *delete (LinkedList *someList, int positionString) 
 {
-  if ( position < 0  ||  position >= someList->size ) 
+  if (positionString < 0  ||  positionString >= someList->size) 
     exit(2);
 
   // walk down the list until we reach the node to be removed
   Node *temp = someList->header;
-  for ( int i=0; i <= position; i++ )
+  for ( int i=0; i <= positionString; i++ )
      temp = temp->next;
   void *removedData = temp->data;
   temp->prev->next = temp->next;   // splice-out the Node
   temp->next->prev = temp->prev; 
   someList->size--;
-  free( temp );   // free-up the memory of the deleted Node
-  return ( removedData );
+  free(temp);   // free-up the memory of the deleted Node
+  return (removedData);
 }
 
 
@@ -197,7 +220,7 @@ void outputList(LinkedList *someList)
      return;
   }
   printf ( "[" );
-  Node *temp = someList->header->next;
+  Node *temp = someList->header->next; 
   for ( int num = 0; num < someList->size; num++ ) {
      printf("%s%s", (char *) temp->data,
                     (num < someList->size-1) ? " " : "" );
@@ -250,12 +273,12 @@ void clear(LinkedList *someList)
  * function 8:
  * Description: replace an element in the list
  * Parameters:  1. the linked list
- *              2. the position that is being replaced
+ *              2. the positionString that is being replaced
  *              3. the new element
  * Return:      1. "return" a pointer to the data that was replaced
- *              2. if the position is illegal, exit the program with status 2
+ *              2. if the positionString is illegal, exit the program with status 2
  */
-void *set(LinkedList *someList, int position, void *newElement) 
+void *set(LinkedList *someList, int positionString, void *newElement) 
 {
     //TODO: function code here
     return NULL;
