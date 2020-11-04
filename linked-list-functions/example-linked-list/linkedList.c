@@ -117,7 +117,7 @@ void addEnd( LinkedList *someList, void *newData )
   Node *lastNode = someList->header->prev;
 
   Node *newNode = malloc ( sizeof ( Node ) );
- 
+
   newNode->data = newData;          // set the fields of the new Node
   newNode->next = someList->header;
   newNode->prev = someList->header->prev;
