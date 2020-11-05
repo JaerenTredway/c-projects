@@ -5,11 +5,10 @@
 
 /* ************************************
  * Author:      Jaeren Tredway
- * Date:        11-3-2020
+ * Date:        11-4-2020
  * Project:     #8: Linked List Functions
  * Interesting fact:    
- *              On this day in 2020, the beast Trump, orange archvillian 
- *              of America's septic tank, retained his position as  
+ *              On this day in 2020, Joe Biden became the new  
  *              President of The United States. 
  * Description:
  *  Input:
@@ -25,8 +24,8 @@
  *      7.  clear()         empty all contents from list
  *      8.  *set()          replace an element in the list
  *  Output:
- *      1.  print out the list in the command line
- *      2.  no detailed error reports provided
+ *      1.  print out the list in the command line when ordered
+ *      2.  no extended error reports provided
  *  To compile, run, and test:
  *      1.  gcc Tredway_J_LLF.c
  *      2.  ./a.out someArgs < someInputFile > someOutputFile
@@ -95,15 +94,13 @@ int main(int argc, char *argv[])
         username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
         switch (command)
         {
-        case 'a':
-            // add an element to the end with addEnd():
+        case 'a': // add an element to the end with addEnd():
             memcpy(username, &str[2], len); //get a substring from [2] to the end
             username[len - 1] = '\0';       //terminate substring
-            printf("username = %s\n", username); //*****TEST
             addEnd(roster, username);
             break;
-        case 'd':
-            // delete an element with *delete():
+        case 'd': // delete an element with *delete():
+            //get the string of the number (called 'position') from the input line: (gets number up to 999)
             position[0] = str[2];
             if (str[3] != ' ')
             {
@@ -122,25 +119,25 @@ int main(int argc, char *argv[])
             outputList(roster);
             break;
         case 'f':
-            // add a username to index 0 with addFirst():
+            // add a data element (a name) to index 0 with addFirst():
+            memcpy(username, &str[2], len); //get a substring from [2] to the end
+            username[len - 1] = '\0';       //terminate substring
+            addFirst(roster, username);
             break;
-        case 'r':
-            // delete the last index with *removeLast():
+        case 'r': // delete the last index with *removeLast():
+            removeLast(roster);
             break;
         case 'c':
             // empty the whole list with clear():
             break;
         case 's':
-            // replace a certain index with *set():
+            // replace the data at one position with *set():
             break;
         default:
             exit(1); //syntax of input file is faulty
         }//END switch()
-        //*****free(username);
     }//END while()
 
-    //*****username = (char*)realloc(username, MAX_NAME_LENGTH * sizeof(char));
-    //*****free(username);
     printf("*****END RESULT:\n");
     outputList(roster);
 
@@ -174,8 +171,6 @@ void createList(LinkedList *someList)
  */
 void addEnd(LinkedList *someList, void *newData)
 {
-    //copy the pointer that points to the last Node:
-    Node *lastNode = someList->header->prev;
     //set the new Node:
     Node *newNode = malloc(sizeof(Node));
     newNode->data = newData;
@@ -243,9 +238,19 @@ void outputList(LinkedList *someList)
  *              2. the element you are adding
  * Return:      nothing (void)
  */
-void addFirst(LinkedList *someList, void *newElement)
+void addFirst(LinkedList *someList, void *newData)
 {
-    //TODO: function code here
+    //copy the pointer that points to the last Node:
+    Node *lastNode = someList->header->prev;
+    //set the new Node:
+    Node *newNode = malloc(sizeof(Node));
+    newNode->data = newData;
+    newNode->next = someList->header->next;
+    newNode->prev = someList->header;
+    //re-set the header:
+    someList->header->next = newNode;
+    //someList->header->prev = newNode;
+    someList->size++;
 }
 
 /* 
@@ -257,8 +262,22 @@ void addFirst(LinkedList *someList, void *newElement)
  */
 void *removeLast(LinkedList *someList)
 {
-    //TODO: function code here
-    return NULL;
+    printf("size before removeLast = %d\n", someList->size);
+    // make sure the list isn't empty:
+    if (someList->size < 1) {
+        exit(2);
+    }
+    // make a pointer that points to the new last Node:
+    Node *newLastNode = someList->header->prev->prev;
+    // make pointers that point to the Node to be deleted:
+    Node *removedNode = someList->header->prev;
+    void *removedData = removedNode->data;
+    // splice the Nodes back together:
+    newLastNode->next = someList->header; 
+    someList->header->prev = newLastNode;
+    someList->size--;
+    free(removedNode); // free-up the memory of the deleted Node
+    return (removedData);
 }
 
 /* 
