@@ -82,21 +82,25 @@ int main(int argc, char *argv[])
     // read one line of input at a time, then process it:
     char str[30];
     char command; //the first char of input that shows the function to call
-    char position[10]; //string of the number of index that gets deleted
-    int len; //the length of the input str not including first char and space
-    char username[MAX_NAME_LENGTH]; //the person's name from the line of input
+    char position[10]; //string of the number of the index that gets deleted
+    int lastIndex; //the last index of the input string (minus the \0)
+    char *username; //store a person's name from the line of input (assigned inside the while loop below, and resassigned in each iteration of the loop)
+
     while (fgets(str, 30, stdin)) //runs until EOF when str will point to NULL
     {
         command = str[0];
-        len = strlen(str) - 2;
+        lastIndex = strlen(str) - 2; 
+        printf("the last index of the input is = %d\n", lastIndex);
+        int positionInt = 0;
         //allocate memory to hold the username:
-        char *username;
         username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
         switch (command)
         {
         case 'a': // add an element to the end with addEnd():
-            memcpy(username, &str[2], len); //get a substring from [2] to the end
-            username[len - 1] = '\0';       //terminate substring
+            //get a substring from [2] to the end:
+            memcpy(username, &str[2], lastIndex); 
+            username[lastIndex + 1] = '\0';       //terminate substring
             addEnd(roster, username);
             break;
         case 'd': // delete an element with *delete():
@@ -111,7 +115,7 @@ int main(int argc, char *argv[])
                 strcat(position, &str[4]);
             }
             //convert the string-number you got from input into an int:
-            int positionInt = atoi(position);
+            positionInt = atoi(position);
             delete (roster, positionInt);
             break;
         case 'o':
@@ -120,26 +124,46 @@ int main(int argc, char *argv[])
             break;
         case 'f':
             // add a data element (a name) to index 0 with addFirst():
-            memcpy(username, &str[2], len); //get a substring from [2] to the end
-            username[len - 1] = '\0';       //terminate substring
+            memcpy(username, &str[2], lastIndex); //get a substring from [2] to the end
+            username[lastIndex + 1] = '\0';       //terminate substring
             addFirst(roster, username);
             break;
         case 'r': // delete the last index with *removeLast():
             removeLast(roster);
             break;
-        case 'c':
-            // empty the whole list with clear():
+        case 'c': // empty the whole list with clear():
+            //TODO (JT) finish
             break;
-        case 's':
-            // replace the data at one position with *set():
+        case 's': // replace the data at one position with *set():
+            //get the string of the number (called 'position') from the input line: (gets number up to 999)
+            position[0] = str[2];
+            if (str[3] != ' ')
+            {
+                strcat(position, &str[3]);
+            }
+            if (str[4] != ' ')
+            {
+                strcat(position, &str[4]);
+            }
+            //convert the string-number you got from input into an int:
+            positionInt = atoi(position);
+            //get a substring from [4] to the end:
+            memcpy(username, &str[4], lastIndex); 
+            username[lastIndex + 1] = '\0';       //terminate substring
+            // replace the data:
+            set(roster, positionInt, username);
             break;
         default:
             exit(1); //syntax of input file is faulty
         }//END switch()
     }//END while()
 
+    //free up any allocated memory:
+    free(username);
+    //TODO (JT): clear(roster);
+
     printf("*****END RESULT:\n");
-    outputList(roster);
+    outputList(roster); //TODO (JT): remove this at the end
 
     return 0;
 
@@ -288,7 +312,7 @@ void *removeLast(LinkedList *someList)
  */
 void clear(LinkedList *someList)
 {
-    //TODO: function code here
+    
 }
 
 /* 
@@ -302,8 +326,34 @@ void clear(LinkedList *someList)
  */
 void *set(LinkedList *someList, int position, void *newElement)
 {
-    //TODO: function code here
-    return NULL;
+    // make sure the list isn't empty and position is valid:
+    if (someList->size < 1 || position >= someList->size) {
+        exit(2);
+    }
+    // march up or down the list until reaching the node to be replaced,
+    // memorize the data that is being replaced, switch out the data:
+    int len = someList->size;
+    int mid = (int)(len / 2);
+    printf("mid = %d\n", mid);
+    printf("len = %d\n", len);
+    void *removedData;
+    if (position <= mid) {
+        Node *temp = someList->header;
+        for (int i = 0; i <= position; i++)
+            temp = temp->next;
+        removedData = temp->data;
+        temp->data = newElement;
+        free(temp);
+    } else {
+        Node *temp = someList->header->prev;
+        printf("%s\n", someList->header->prev->data);
+        for (int i = len-1; i > position; i--)
+            temp = temp->prev;
+        removedData = temp->data;
+        temp->data = newElement;
+        free(temp);
+    }
+    return (removedData);
 }
 
 //**** END function definitions ****
