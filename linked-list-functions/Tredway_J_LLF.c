@@ -48,6 +48,8 @@ typedef struct
 
 //VARIABLES:
 #define MAX_NAME_LENGTH 20
+int len = 0;
+int mid = 0;
 
 //FUNCTION PROTOTYPES:
 void createList(LinkedList *someList);
@@ -79,19 +81,30 @@ int main(int argc, char *argv[])
     LinkedList *roster = &myList;
     createList(roster); // initialize the dummy header to start the list
 
-    // read one line of input at a time, then process it:
-    char str[30];
-    char command; //the first char of input that shows the function to call
-    char position[10]; //string of the number of the index that gets deleted
-    int lastIndex; //the last index of the input string (minus the \0)
-    char *username; //store a person's name from the line of input (assigned inside the while loop below, and resassigned in each iteration of the loop)
+    //variables:
+    char    str[30]; //store one line of input
+    char    command; //the first char of input that shows the function to call
+    char    position[10]; //string of the number of the list position
+    int     positionInt; //stores the int version of the position string 
+    int     lastIndex; //the last index of the input string (minus the \0)
+    char    *username; //store a person's name from the line of input (assigned inside the while loop below, and resassigned in each iteration of the loop)
 
+    // read one line of input at a time, then process it:
     while (fgets(str, 30, stdin)) //runs until EOF when str will point to NULL
     {
-        command = str[0];
-        lastIndex = strlen(str) - 2; 
-        printf("the last index of the input is = %d\n", lastIndex);
-        int positionInt = 0;
+        len = strlen(str); //length of input line picked up by fgets()
+        lastIndex = len - 2; // accounts for newline that fgets infects str with
+        //remove the diabolical newline out of fgets() input:
+        for (unsigned int i = 0; i < len; i++) {
+            if (str[i] == '\n') str[i] = '\0';
+        }
+        
+        command = str[0]; //the char that indicates which function to call
+//TEST:
+        printf("length of input string = %lu\n", strlen(str));
+        printf("command = %c\n", command);
+        printf("input string = %s\n\n", str);
+ 
         //allocate memory to hold the username:
         username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
 
@@ -99,62 +112,67 @@ int main(int argc, char *argv[])
         {
         case 'a': // add an element to the end with addEnd():
             //get a substring from [2] to the end:
-            memcpy(username, &str[2], lastIndex); 
-            username[lastIndex + 1] = '\0';       //terminate substring
+            memcpy(username, &str[2], lastIndex);
+            //terminate substring:
+            username[lastIndex+1] = '\0'; 
+//TEST:
+            printf("username length = %lu\n", strlen(username));
+            printf("username w/ no newline= %s", username); 
+
             addEnd(roster, username);
             break;
         case 'd': // delete an element with *delete():
-            //get the string of the number (called 'position') from the input line: (gets number up to 999)
+            //get the string version of the number from the input:
             position[0] = str[2];
-            if (str[3] != ' ')
-            {
-                strcat(position, &str[3]);
-            }
-            if (str[4] != ' ')
-            {
-                strcat(position, &str[4]);
-            }
+                // optional code for getting up to a 3-digit number:
+                // if (str[3] != ' ')
+                // {
+                //     strcat(position, &str[3]);
+                // }
+                // if (str[4] != ' ')
+                // {
+                //     strcat(position, &str[4]);
+                // }
             //convert the string-number you got from input into an int:
             positionInt = atoi(position);
             delete (roster, positionInt);
             break;
-        case 'o':
-            // print out the list with outputList():
+        case 'o': // print out the list with outputList():
             outputList(roster);
             break;
-        case 'f':
-            // add a data element (a name) to index 0 with addFirst():
+        case 'f': // add a data element (a name) to index 0 with addFirst():
             memcpy(username, &str[2], lastIndex); //get a substring from [2] to the end
-            username[lastIndex + 1] = '\0';       //terminate substring
+            username[lastIndex+1] = '\0';       //terminate substring
             addFirst(roster, username);
             break;
         case 'r': // delete the last index with *removeLast():
             removeLast(roster);
             break;
         case 'c': // empty the whole list with clear():
-            //TODO (JT) finish
+            clear(roster);
             break;
         case 's': // replace the data at one position with *set():
-            //get the string of the number (called 'position') from the input line: (gets number up to 999)
+            //get the string of the number (called 'position') from the input:
             position[0] = str[2];
-            if (str[3] != ' ')
-            {
-                strcat(position, &str[3]);
-            }
-            if (str[4] != ' ')
-            {
-                strcat(position, &str[4]);
-            }
+                // optional code for getting up to a 3-digit number:
+                // if (str[3] != ' ')
+                // {
+                //     strcat(position, &str[3]);
+                // }
+                // if (str[4] != ' ')
+                // {
+                //     strcat(position, &str[4]);
+                // }
             //convert the string-number you got from input into an int:
             positionInt = atoi(position);
             //get a substring from [4] to the end:
             memcpy(username, &str[4], lastIndex); 
-            username[lastIndex + 1] = '\0';       //terminate substring
+            username[lastIndex+1] = '\0';       //terminate substring
             // replace the data:
             set(roster, positionInt, username);
             break;
         default:
-            exit(1); //syntax of input file is faulty
+            exit(1); //if you made it this far, syntax of input file is faulty
         }//END switch()
     }//END while()
 
@@ -186,6 +204,7 @@ void createList(LinkedList *someList)
     someList->header->prev = someList->header;
 }
 
+
 /* 
  * function 2:
  * Description: adds a new data element to the end of the list
@@ -205,6 +224,7 @@ void addEnd(LinkedList *someList, void *newData)
     someList->header->prev = newNode;
     someList->size++;
 }
+
 
 /* 
  * function 3:
@@ -231,6 +251,7 @@ void *delete (LinkedList *someList, int position)
     return (removedData);
 }
 
+
 /* 
  * function 4:
  * Description: print out the contents of the list as strings
@@ -253,7 +274,9 @@ void outputList(LinkedList *someList)
      temp =  temp->next;
   }
   printf ( "]\n" );
+  //DIABOLICAL BUG ALERT: do not free(temp) here
 }
+
 
 /* 
  * function 5:
@@ -277,6 +300,7 @@ void addFirst(LinkedList *someList, void *newData)
     someList->size++;
 }
 
+
 /* 
  * function 6:
  * Description: delete the last element in the list
@@ -286,7 +310,6 @@ void addFirst(LinkedList *someList, void *newData)
  */
 void *removeLast(LinkedList *someList)
 {
-    printf("size before removeLast = %d\n", someList->size);
     // make sure the list isn't empty:
     if (someList->size < 1) {
         exit(2);
@@ -304,6 +327,7 @@ void *removeLast(LinkedList *someList)
     return (removedData);
 }
 
+
 /* 
  * function 7:
  * Description: empty all contents from list
@@ -312,8 +336,9 @@ void *removeLast(LinkedList *someList)
  */
 void clear(LinkedList *someList)
 {
-    
+    //TODO (JT) write function
 }
+
 
 /* 
  * function 8:
@@ -332,10 +357,8 @@ void *set(LinkedList *someList, int position, void *newElement)
     }
     // march up or down the list until reaching the node to be replaced,
     // memorize the data that is being replaced, switch out the data:
-    int len = someList->size;
-    int mid = (int)(len / 2);
+    mid = (int)(someList->size / 2);
     printf("mid = %d\n", mid);
-    printf("len = %d\n", len);
     void *removedData;
     if (position <= mid) {
         Node *temp = someList->header;
@@ -343,15 +366,15 @@ void *set(LinkedList *someList, int position, void *newElement)
             temp = temp->next;
         removedData = temp->data;
         temp->data = newElement;
-        free(temp);
+        //DIABOLICAL BUG ALERT: do not free(temp) here
     } else {
         Node *temp = someList->header->prev;
         printf("%s\n", someList->header->prev->data);
-        for (int i = len-1; i > position; i--)
+        for (int i = someList->size - 1; i > position; i--)
             temp = temp->prev;
         removedData = temp->data;
         temp->data = newElement;
-        free(temp);
+        //DIABOLICAL BUG ALERT: do not free(temp) here
     }
     return (removedData);
 }
