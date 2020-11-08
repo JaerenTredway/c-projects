@@ -5,7 +5,7 @@
 
 /* ************************************
  * Author:      Jaeren Tredway
- * Date:        11-4-2020
+ * Date:        11-7-2020
  * Project:     #8: Linked List Functions
  * Interesting fact:    
  *              On this day in 2020, Joe Biden became the new  
@@ -15,7 +15,7 @@
  *      1.  An input file is redirected to this program at runtime.
  *      2.  One line of input is read at a time, then processed.
  *  Functions (basic outline): 
- *      1.  createList()    allocates memory for the 'dummy header node'
+ *      1.  createList()    allocate memory for the 'dummy header node'
  *      2.  addEnd()        add a new data element to the end of the list
  *      3.  *delete()       delete an element from the given position
  *      4.  outputList()    output the contents of the list as strings
@@ -28,7 +28,7 @@
  *      2.  no extended error reports provided
  *  To compile, run, and test:
  *      1.  gcc Tredway_J_LLF.c
- *      2.  ./a.out someArgs < someInputFile > someOutputFile
+ *      2.  ./a.out < someInputFile > myOutput
  *      3.  diff myOutput outputFile1
  ************************************ */
 
@@ -98,16 +98,11 @@ int main(int argc, char *argv[])
         for (unsigned int i = 0; i < len; i++) {
             if (str[i] == '\n') str[i] = '\0';
         }
-        
-        command = str[0]; //the char that indicates which function to call
-//TEST:
-        printf("length of input string = %lu\n", strlen(str));
-        printf("command = %c\n", command);
-        printf("input string = %s\n\n", str);
- 
+        //the char that indicates which function to call:
+        command = str[0]; 
         //allocate memory to hold the username:
         username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
-
+        //switch to process the input and run the indicated command:
         switch (command)
         {
         case 'a': // add an element to the end with addEnd():
@@ -115,24 +110,11 @@ int main(int argc, char *argv[])
             memcpy(username, &str[2], lastIndex);
             //terminate substring:
             username[lastIndex+1] = '\0'; 
-//TEST:
-            printf("username length = %lu\n", strlen(username));
-            printf("username w/ no newline= %s", username); 
-
             addEnd(roster, username);
             break;
         case 'd': // delete an element with *delete():
             //get the string version of the number from the input:
             position[0] = str[2];
-                // optional code for getting up to a 3-digit number:
-                // if (str[3] != ' ')
-                // {
-                //     strcat(position, &str[3]);
-                // }
-                // if (str[4] != ' ')
-                // {
-                //     strcat(position, &str[4]);
-                // }
             //convert the string-number you got from input into an int:
             positionInt = atoi(position);
             delete (roster, positionInt);
@@ -154,15 +136,6 @@ int main(int argc, char *argv[])
         case 's': // replace the data at one position with *set():
             //get the string of the number (called 'position') from the input:
             position[0] = str[2];
-                // optional code for getting up to a 3-digit number:
-                // if (str[3] != ' ')
-                // {
-                //     strcat(position, &str[3]);
-                // }
-                // if (str[4] != ' ')
-                // {
-                //     strcat(position, &str[4]);
-                // }
             //convert the string-number you got from input into an int:
             positionInt = atoi(position);
             //get a substring from [4] to the end:
@@ -178,12 +151,9 @@ int main(int argc, char *argv[])
 
     //free up any allocated memory:
     free(username);
-    //TODO (JT): clear(roster);
+    clear(roster);
 
-    printf("*****END RESULT:\n");
-    outputList(roster); //TODO (JT): remove this at the end
-
-    return 0;
+    return 0; //if you made it this far, program run was successful
 
 } //END main()
 
@@ -336,7 +306,18 @@ void *removeLast(LinkedList *someList)
  */
 void clear(LinkedList *someList)
 {
-    //TODO (JT) write function
+    int thisLength = someList->size;
+    for (unsigned int i = 0; i < thisLength; i++) {
+        // make a pointer that points to the new last Node:
+        Node *newLastNode = someList->header->prev->prev;
+        // make pointer that points to the Node to be deleted:
+        Node *removedNode = someList->header->prev;
+        // splice the Nodes back together:
+        newLastNode->next = someList->header; 
+        someList->header->prev = newLastNode;
+        someList->size--;
+        free(removedNode); // free-up the memory of the deleted Node
+    }
 }
 
 
@@ -358,7 +339,6 @@ void *set(LinkedList *someList, int position, void *newElement)
     // march up or down the list until reaching the node to be replaced,
     // memorize the data that is being replaced, switch out the data:
     mid = (int)(someList->size / 2);
-    printf("mid = %d\n", mid);
     void *removedData;
     if (position <= mid) {
         Node *temp = someList->header;
@@ -369,7 +349,6 @@ void *set(LinkedList *someList, int position, void *newElement)
         //DIABOLICAL BUG ALERT: do not free(temp) here
     } else {
         Node *temp = someList->header->prev;
-        printf("%s\n", someList->header->prev->data);
         for (int i = someList->size - 1; i > position; i--)
             temp = temp->prev;
         removedData = temp->data;
@@ -377,6 +356,4 @@ void *set(LinkedList *someList, int position, void *newElement)
         //DIABOLICAL BUG ALERT: do not free(temp) here
     }
     return (removedData);
-}
-
-//**** END function definitions ****
+} // END function definitions
