@@ -32,7 +32,7 @@ typedef struct
 } BinaryTree;
 
 //variables:
-int singleChildCounter = -99;
+int singleChildCounter = 0;
 
 
 // function proto-types:
@@ -189,7 +189,6 @@ void postorder(Node *curr)
 // each node is smaller than its parent value:
 bool isHeapOrdered(Node *curr)
 {
-    printf("isHeapOrdered() has been called...\n");
     // exit condition, if node has no children: 
     if (curr->left == NULL && curr->right == NULL) {
         return (true);
@@ -203,7 +202,7 @@ bool isHeapOrdered(Node *curr)
         if (curr->data >= curr->right->data) {
             isHeapOrdered(curr->right);
         } else {
-            printf("FOUND THE FAILSITE\n");
+            //printf("FOUND THE FAILURE LOCATION\n");
             return (false);
         }
     // if there are 2 child nodes, recurse down both sub-trees: 
@@ -221,27 +220,22 @@ bool isHeapOrdered(Node *curr)
 // one child:
 int numSingleChild(Node *curr)
 {
-    printf("numSingleChild has been called...\n");
     // exit condition, if node has no children: 
     if (curr->left == NULL && curr->right == NULL) {
-        printf("node has no children\n");
         return (singleChildCounter); 
     }
-    // see if the node has only one child, recurse down that branch: 
+    // if the node has only one child, recurse down that branch: 
     if (curr->right == NULL) { 
-        printf("recursing down left child\n");
         singleChildCounter++; 
         numSingleChild(curr->left);
     } else if (curr->left == NULL) {
-        printf("recursing down right child\n");
         singleChildCounter++; 
         numSingleChild(curr->right);
     // if there are 2 child nodes, recurse down into both:
     } else if (curr->right != NULL && curr->left != NULL){
-        printf("recursion down into both child nodes\n");
-        return ((numSingleChild(curr->left)) && (numSingleChild(curr->right))); 
+        (numSingleChild(curr->left));
+        (numSingleChild(curr->right)); 
     }
-    printf("AAAAARRRRRRGGGGG\n");
     return singleChildCounter;
 }
 
