@@ -4,13 +4,14 @@
 
 /* ************************************
  * Author:      Jaeren Tredway
- * Date:        11-12-2020
+ * Date:        11-20-2020
  * Project:     #9: Recursive Binary Tree Functions
  * Description:
  *  Input:
- *      1.  No additional input required, program has built-in 'input'
+ *      1.  No additional input required, program has built-in 'input' to 
+ *          test the functions with.
  *  Output:
- *      1.  print out the results of each function 
+ *      1.  Prints out the results of each function.
  *  To compile and run:
  *      1.  gcc Tredway_J_RBTF.c
  *      2.  ./a.out
@@ -46,9 +47,9 @@ int numSingleChild(Node *curr);
 void makeMirror(Node *curr);
 
 
-//variables:
-int singleChildCounter = 0;
-Node *tempNode;
+//variables needed due to functions being called recursively:
+int singleChildCounter = 0; //used in numSingleChild()
+Node *tempNode;             //used in makeMirror()
 
 
 //main method sets up tree, then prints out function results:
@@ -259,7 +260,7 @@ void makeMirror(Node *curr)
         tempNode    = curr->left; 
         curr->left  = curr->right; 
         curr->right = tempNode; 
-        //WAAAAAT don't free(tempNode) here!
+        //WAAAAAT don't free(tempNode) here! Causes segmentation fault!
   } 
 }
 
