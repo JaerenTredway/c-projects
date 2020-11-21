@@ -31,9 +31,6 @@ typedef struct
     Node *root; // pointer to the root node of the tree
 } BinaryTree;
 
-//variables:
-int singleChildCounter = 0;
-
 
 // function proto-types:
 void createTree(BinaryTree *someTree);
@@ -49,6 +46,11 @@ int numSingleChild(Node *curr);
 void makeMirror(Node *curr);
 
 
+//variables:
+int singleChildCounter = 0;
+Node *tempNode;
+
+
 //main method sets up tree, then prints out function results:
 int main()
 {
@@ -58,6 +60,7 @@ int main()
     myTree->root = initTree();
     printf("the tree is:\n");
     toString(myTree->root);
+
 
     //print out function results:
     int treeSize = size(myTree->root);
@@ -244,6 +247,20 @@ int numSingleChild(Node *curr)
 // that is, the right child becomes the left child, and vice versa:
 void makeMirror(Node *curr)
 {
+    //exit condition: if the current node is null or it has no children: 
+    if (curr == NULL || (curr->left == NULL && curr->right == NULL)) {
+        return;
+    } else {  
+        //recurse down child nodes:
+        makeMirror(curr->left); 
+        makeMirror(curr->right); 
+        //when unwinding the recursion, swap the siblings:
+        //note: tempNode was declared globally so it doesn't get re-declared every time the function recurses:
+        tempNode    = curr->left; 
+        curr->left  = curr->right; 
+        curr->right = tempNode; 
+        //WAAAAAT don't free(tempNode) here!
+  } 
 }
 
 
