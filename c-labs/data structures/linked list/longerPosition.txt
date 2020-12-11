@@ -1,0 +1,9 @@
+// optional code for getting up to a 3-digit number:
+if (str[3] != ' ')
+{
+    strcat(position, &str[3]);
+}
+    if (str[4] != ' ')
+{
+    strcat(position, &str[4]);
+}
